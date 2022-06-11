@@ -105,3 +105,24 @@ void ChaCha20XOR(uint8_t key[32], uint32_t counter, uint8_t nonce[12], uint8_t *
         }
     }
 }
+
+void ChaCha8XOR(uint8_t key[32], uint32_t counter, uint8_t nonce[12], uint8_t* in, uint8_t* out, int inlen) {
+    int i, j;
+
+    uint32_t s[16];
+    uint8_t block[64];
+
+    chacha20_init_state(s, key, counter, nonce);
+
+    for (i = 0; i < inlen; i += 64) {
+        chacha20_block(s, block, 8);
+        s[12]++;
+
+        for (j = i; j < i + 64; j++) {
+            if (j >= inlen) {
+                break;
+            }
+            out[j] = in[j] ^ block[j - i];
+        }
+    }
+}
